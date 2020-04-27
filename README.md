@@ -2,7 +2,7 @@
 
 The main aim of this project is to develop a summarizer which takes the data of COVID related literature from Kaggle and summarizes them. By doing so it helps the researchers and the student community to get a summary of all the similar documents which helps them in there respective research work.
 
-.1) Takes a subset of documents of COVID related data (nearly 5000 files out of 60000).
+1) Takes a subset of documents of COVID related data (nearly 6000 files out of 60000).
 2) Tokenizes and clusters the documents.
 3) Finally summarizes each cluster of documents into a file.
 
@@ -75,25 +75,14 @@ Open your Terminal..
 
 ## Steps to Run the project
 
-Now run the project using the following command (Inside the cs5293p20-project-1)
+Now run the project using the following command (Inside the cs5293p20-project2)
 
- > pipenv run python project1/redactor.py --input '*.txt' \
-                    --input 'otherfiles/*.md' \
-                    --names --dates \
-                    --concept 'kids' \
-                    --output 'files/' \
-                    --stats stdout
+ > pipenv shell
+  
+ > python3 summarizer.py --input "/newdisk/project2-data/" --input "some-value"
   
 This will display the result in your console / terminal.
 
-## To run testcases 
-Go inside the virtual environment by running the following commands.
-
-1) cd cs5293p20-project-1
-
-2) Run pipenv shell
-
-3) Run pytest
 
 ## Assumptions made in the project are
 
@@ -101,43 +90,32 @@ Go inside the virtual environment by running the following commands.
 
 2) I am also skipping those papers which don't have any body_text. 
 
-3) For determining the number of clusters , I have used Knee-Elbow method by providing the clusters range of (2,30). I have taken the specified range based on trail and error. My assumption over here is that we can never determine what could be the optimal cluster range as it all depends on the data. For this project since we are choosing 5000 files randomly we cannot determine how close or how far they may be contextually related. 
+3) For determining the number of clusters , I have used Knee-Elbow method by providing the clusters range of (2,20). I have taken the specified range based on trail and error. My assumption over here is that we can never determine what could be the optimal cluster range as it all depends on the data. For this project since we are choosing 5000 files randomly we cannot determine how close or how far they may be contextually related. 
 
-4) 
+4) Computationally its taking too much time so I have run the my summarization for one percent of data and have added the output of these files. The instance with 10% of data is also still running.
 
-5) I have taken two text files modi.txt , text1.txt and one markdown file under otherfiles/ for my execution.
+### Functionality of summarizer.py
 
-### Functionality of redactor.py
+    This python file is the driving file for the entire project. Here I have registered the input flag to capture its value which are then passed on to the respective methods of project1.py file. I have used argparse for reading the commandline     arguments.
 
-    This python file is the driving file for the entire project. Here we register all the flags and capture there values         which are then passed on to the respective methods of project1.py file. I have used argparse for reading the commandline     arguments.
+### Functionality of each method in project2.py
 
-### Functionality of each method in project1.py
-
-#### readFiles(pattern="*.txt"):
-    This method reads the files of the pattern provided by the --input flags. 
-    Input - ['*.txt','..'] - List of strings 
-    It has a lamda function just with a read functionality and this method returns data in the read from the files in the       form list of strings.This list of data is used by the other methods to redact the data.
+#### read_files(path,percent=10):
+    This method reads the files of the pattern provided by the --input flags and it randomly chooses 10 percent of the files     which account to around 6000 files.This method then returns the file paths of the selected files. I have used glob.glob     function to get the files path.
     
-#### redact_names(data):
-    Approach for extracting names:
-    During extraction of names from the text files , first I have broken all paragraphs into sentences and later each           sentence into individual words,there by,creating a words_list.Then applied the pos_tag to get the parts of speech tag       for each word and then applied ne_chunk to get the named_entities like PERSON names from the text. But this approach was     giving me extra words like GOODS, SERVICE, TEX so on. But later, I realized that the above approach of creating a           words_list and then applying pos_tag is wrong as the parts of speech of each word depends on the context where it is         used in the sentence. So I have changed my approach and applied ne_chunk on pos_tagged words of each sentence and           extracted the named_entities from them. This approach has given me good results.
-    For easing through the tree parse I have also used a lambda function.
-    Returns : name redacted data list , list of counts of names redacted in each file. A global list for count is maintained     which is used for statistics.
-References used: (https://stackoverflow.com/questions/14841997/how-to-navigate-a-nltk-tree-tree)
+#### read_json(data):
+    This a helper function which takes the json data of each paper and return a dictionary containing only the 'paper_id'       and 'body_text' as keys.
 
-#### redact_genders(data):
-    Approach for extracting genders from text:
-    During the extraction of genders from the text , I have tried using WordNet and synoymns but it didn't workout as the       corpus for synoymns and antonymns are to less, so I have explicitly taken a list of male_words and female_words and         combined them into a list of gender_words . I have also added camel-cased gender_words to the gender_words list and then     redacted the words which are part of this list.
-    Returns: gender redacted data list , list of counts of genders redacted in each file. The count of genders in each file     is appended to a global list so that it can be used for statistics.
-References used: (http://nealcaren.github.io/text-as-data/html/times_gender.html)
+#### json_2_df_2_tokenizer(files):
+    This is the method which is used for achieving task 2 of this project. Tokenizing the files.
+    I have first clubed all the dictionaries which have been returned by the read_json on each file into a final dictionary.
+    Then I have converted it into a dataframe which now contains 'paper_id' and 'body_text' as columns.
+    Now I extract the 'body_text' column completely as list of strings and pass it to the normalize_document function which     normalizes the each text and return a list of strings which is the final normalized corpus upon which we need to apply       the vectorization. I have used CountVectorizer to generate count vectors of each row(i.e., each 'body_text' string) and     I have also experimented with Tfidfvectorizer with various parameters and finally I have settled for Tfidfvectorizer and     also set the min_df to 1. I have used Tfidfvectorizer over CountVectorizer because of the number of features and also we     need to take into account the inverse document frequency of each word as it helps in clustering the similar documents. 
+    This method returns the dataframe and doc_matrix which are generated.So that they can be used by the KMeans and finally     to append labels to the clusters.
 
-#### redact_dates(data):
-    Approach for matching dates :
-    date formats considered = 'dd/mm/yyyy | dd-mm-yyyy | yyyy-mm-dd | yyyy/mm/dd | yyyy-dd-mm | yyyy/dd/mm | mm/dd/yyyy |       mm-dd-yyyy | dd (January-December|jan-dec|Jan-Dec|january-decemeber) , yyyy | dd(th) (January-December|jan-dec|Jan-         Dec|january-decemeber) yyyy | dd(st) (January-December|jan-dec|Jan-Dec|january-decemeber) yyyy | (January-December|jan-     dec|Jan-Dec|january-decemeber) dd , yyyy .
-    I am extracting the dates of the above format and redacting them. For this to work , I have written a regular expression     that matches the above mentioned date formats. It doesn't redact text containing only months and year or only year.
-    Returns : dates redacted data list , list of counts of dates redacted in each file. The count of the dates in each file     are appending to a global list so that it can be used for statistics.
-References used: (https://stackoverflow.com/questions/10308970/matching-dates-with-regular-expressions-in-python)                            (https://docs.python.org/3/library/re.html)
-
+#### determining_n_clusters(doc_matrix):
+    For determining the number of optimal clusters for clustering the documents. I have used the knee-elbow method to           determine the optimal k-value. The have taken a KMeans model with max_iter=1000,random_state=42(as mentioned by the         sklearn documentation so that the each time the cluster inits are taken the same),n_jobs='-1' (to enable the parallel       processing of the calculating the clusters). I am then passing this model to the KElbowVisualizer(yellowbrick-package)       with k-value search space in between (2,30). I have taken this specific range based on the computation time and some         trail & error.I have discussed more about this in assumption 3. I have tried to include the visualization so that the       optimal k value is displayed. But since we are running it in a terminal, visualization is not possible so I am using the
+    KElbowVisualizer's attribute (elbow.value_) to get the optimal cluster value. This function finally returns that 'k'         value.
 #### redact_concept(data,concept):
     Approach for extracting concept :
     I am passing data to into the redact_concept function along with the concept to be searched for. I have used wordnet         synset derived from nltk.corpus for getting all the synsets related to the concept. Then I have searched for hypernymns,     homonymns,holonymns of each synset of the concept. I have not taken into account the meronymns as they talk about part       of the concept or the substances which contain the concept. I have formed a list of words from each synset of the           concept and searched whether a sentence contains any word of the list of words(the                                           synonymns,hypernymns,hyonymns,holonymns). If the sentence contains any word then it is redacted. This approach may have     certain errors as wordnet works well for verbs and noun.I am appending all the redacted sentences to a global list so       that the stats function can use it to display the statistics.
