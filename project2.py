@@ -34,6 +34,7 @@ def read_json(file):
 
 
 def json_2_df_2_tokenizer(files):
+    print("Inside json2df2tokenizer")
     final_dict = {'paper_id':[],'body_text':[]}
     for file in files:
         d = read_json(file)
@@ -47,26 +48,32 @@ def json_2_df_2_tokenizer(files):
     df.drop(indexes,inplace=True)
     #print(df)
     #normalize_function = np.vectorize(normalize_document)
-    normalized_corpus = normalize_document(list(df['body_text']))
+    normalized_corpus = normalize_corpus(list(df['body_text']))
     #print(normalized_corpus)
-    cv = CountVectorizer()
+    cv = TfidfVectorizer()
     doc_matrix =cv.fit_transform(normalized_corpus)
+    print("before reduction",doc_matrix.shape)
+    print("exiting json2df method")
     return doc_matrix,df
 
 #using the yellow brick ELbowkneeVisulaizer
 def determining_n_clusters(doc_matrix):
-    model = KMeans()
+    print("Inside determining clusters")
+    print("number of features after reduction",doc_matrix.shape)
+    model = KMeans(max_iter=1000,random_state=42,n_jobs=-1)
     visualizer=KElbowVisualizer(model,k=(2,30))
     visualizer.fit(doc_matrix)
     #visualizer.show()
     #get the optimal cluster value
     k = visualizer.elbow_value_
+    print("exiting the determining clusters")
     return k
 
 def clustering_documents(n_clusters,doc_matrix,df):
+    print("Clustering the documents")
     km = KMeans(n_clusters=n_clusters,max_iter=1000,random_state=42,n_jobs=-1)
     km.fit(doc_matrix)
-    print(km.labels_)
+    #print(km.labels_)
     df['KMeans_label']=list(km.labels_)
     print(df.info())
     clustered_docs = (df.sort_values(by=['KMeans_label']).groupby(['KMeans_label']))
@@ -83,10 +90,12 @@ def clustering_documents(n_clusters,doc_matrix,df):
         doc_string = ''.join(doc)
         #print(doc_string)
         dic_clusters_docs[i]=doc_string
+    print("Exiting clustering documents")
     return dic_clusters_docs
 
 
 def summarize_clusters(dic_clusters_docs):
+    print("Entering summarize clusterss")
     list_of_summaries=[]
     for (cluster_index,item) in dic_clusters_docs.items():
         list_of_summaries.append((cluster_index,summarize(item)))
@@ -97,24 +106,6 @@ def summarize_clusters(dic_clusters_docs):
         path = os.getcwd()+"/output/"+filename
         with open(path,"w") as f:
             f.write(''.join(summary))
-
-#used for normalizing the text in dataframe
-def normalize_document(text,lemmatize=True):
-    l = []
-    for txt in text:
-        txt=re.sub(r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+','',txt)
-        txt = re.sub(r'[^a-zA-Z0-9\s]', '', txt,flags=re.I|re.A)
-        txt = re.sub(r'[0-9]','',txt)
-        txt = txt.lower()
-        txt = txt.strip()
-        txt = remove_stopwords(txt)
-        if lemmatize:
-            txt = lemmatize_text(txt)
-        else:
-            txt = txt
-        l.append(txt)
-    return l
-
 
 def remove_stopwords(text):
     stopword_list = nltk.corpus.stopwords.words('english')
@@ -160,7 +151,7 @@ def lemmatize_text(text):
     return lemmatized_text
 
 
-def normalize_corpus(corpus, lemmatize=True, tokenize=False):
+def normalize_corpus(corpus, lemmatize=True):
     normalized_corpus = []
     for text in corpus:
         text=re.sub(r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+','',text)
@@ -172,11 +163,7 @@ def normalize_corpus(corpus, lemmatize=True, tokenize=False):
         text = re.sub(r'[0-9]','',text)
         if lemmatize:
             text = lemmatize_text(text)
-        if tokenize:
-            text = tokenize_text(text)
-            normalized_corpus.append(text)
-        else:
-            normalized_corpus.append(text)
+        normalized_corpus.append(text)
     return normalized_corpus
 
 
@@ -196,6 +183,7 @@ def parse_document(document):
 
 
 def summarize(doc,n_top=10):
+    print("Entered the summarize method")
     sentences = parse_document(doc)
     print(len(sentences))
     norm_sentences = normalize_corpus(sentences)
@@ -208,9 +196,10 @@ def summarize(doc,n_top=10):
     sentences_rank = sorted(((score,index) for index,score in scores.items()),reverse=True)
     #print(sentences_rank)
     top_indices =[sentences_rank[index][1] for index in range(n_top)]
-    print(top_indices)
+    #print(top_indices)
     summary=[sentences[index] for index in top_indices]
     #print(summary)
+    print("Exiting summarize method")
     return summary
 
 

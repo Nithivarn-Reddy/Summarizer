@@ -16,6 +16,8 @@ if __name__=="__main__":
 dc = pickle.load(open("/home/nithivarn_gmail_com/matrix.txt","rb"))
 df = pickle.load(open("/home/nithivarn_gmail_com/df.txt","rb"))
 """
+
+
 if len(sample_files):
     #second function which takes the file paths and returns a doc_matrix and dataframe
     doc_matrix,df=project2.json_2_df_2_tokenizer(sample_files)
