@@ -1,6 +1,6 @@
 # cs5293sp20-project2
 
-The main aim of this project is to develop a summarizer which takes the data of COVID related literature from Kaggle and summarizes them. By doing so it helps the researchers and the student community to get a summary of all the similar documents which helps them in there respective research work.
+The main aim of this project is to develop a summarizer which takes the data of COVID related literature from Kaggle and summarizes them. By doing so it helps the researchers and the student community to get a summary of all the similar documents which helps them in their respective research work.
 
 High-level overview.
 1) Takes a subset of documents of COVID related data (nearly 6000 files out of 60000).
@@ -62,7 +62,7 @@ Now run the project using the following command (Inside the cs5293p20-project2)
   
  > python3 summarizer.py --input "/newdisk/project2-data/" --input "some-value"
   
-The Output files is generated inside a Output directory of the current working directory.
+The Output files is generated inside a output directory of the current working directory.
 
 ## Assumptions made in the project are
 
@@ -70,13 +70,15 @@ The Output files is generated inside a Output directory of the current working d
 
 2) I am also skipping those papers which don't have any body_text. 
 
-3) For determining the number of clusters , I have used Knee-Elbow method by providing the clusters range of (2,20). I have taken the specified range based on trail and error. My assumption over here is that we can never determine what could be the optimal cluster range as it all depends on the data. For this project since we are choosing 5000 files randomly we cannot determine how close or how far they may be contextually related. 
+3) For determining the number of clusters , I have used Knee-Elbow method by providing the clusters range of (2,30). I have taken the specified range based on trail and error. My assumption over here is that we can never determine what could be the optimal cluster range as it all depends on the data. For this project since we are choosing 6000 files randomly we cannot determine how close or how far they may be contextually related. 
 
 4) Computationally its taking too much time so I have run the my summarization for one percent of data and have added the output of these files. The instance with 10% of data is also still running.
 
+5) This summarizer takes english language only into consideration. It doesn't take into consideration other languages.
+
 ### Functionality of summarizer.py
 
-This python file is the driving file for the entire project. Here I have registered the input flag to capture its value which are then passed on to the respective methods of project1.py file. I have used argparse for reading the commandline    arguments.
+This python file is the driving file for the entire project. Here I have registered the --input flag to capture its value which are then passed on to the respective methods of project2.py file. I have used argparse for reading the commandline    arguments.
 
 ### Functionality of each method in project2.py
 
