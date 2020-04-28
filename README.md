@@ -8,12 +8,12 @@ High-level overview.
 3) Finally summarizes each cluster of documents into a file.
 
 The step-wise functionality of achieving the summarization.
-1)Explore the data set and look at the format of the files.
-2)Function to choose a set of documents in the data set, randomly choose 10 percent of the total files.
-3)A file reader a file and tokenize the data.
-4)Function to take tokenized data and add it to the clustering method of your choice.
-5)Function to take clusters of documents, and summarize the documents.
-6)Write the summarized clusters to a file.
+1) Explore the data set and look at the format of the files.
+2) Function to choose a set of documents in the data set, randomly choose 10 percent of the total files.
+3) A file reader a file and tokenize the data.
+4) Function to take tokenized data and add it to the clustering method of your choice.
+5) Function to take clusters of documents, and summarize the documents.
+6) Write the summarized clusters to a file.
 
 ### Author - Nithivarn Reddy Shanigaram 
 
