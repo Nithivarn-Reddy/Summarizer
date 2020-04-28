@@ -62,8 +62,7 @@ Now run the project using the following command (Inside the cs5293p20-project2)
   
  > python3 summarizer.py --input "/newdisk/project2-data/" --input "some-value"
   
-This will display the result in your console / terminal.
-
+The Output files is generated inside a Output directory of the current working directory.
 
 ## Assumptions made in the project are
 
