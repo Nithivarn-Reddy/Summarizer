@@ -19,34 +19,7 @@ The step-wise functionality of achieving the summarization.
 
 ### Email - nithivarn.reddy.shanigaram-1@ou.edu
 
-### Structure
-```
-.
-└── cs5293p20-project-1
-    ├── COLLABORATORS
-    ├── LICENSE
-    ├── Pipfile
-    ├── Pipfile.lock
-    ├── README.md
-    ├── files
-    │   ├── modi.redacted.txt
-    │   └── text1.redacted.txt
-    ├── modi.txt
-    ├── otherfiles
-    │   ├── test.md
-    │   └── test_1.txt
-    ├── project1
-    │   ├── __init__.py
-    │   ├── project1.py
-    │   └── redactor.py
-    ├── setup.py
-    ├── tests
-    │   ├── __init__.py
-    │   └── test_redact.py
-    └── text1.txt
-```
-
-External Packages used 
+## External Packages used 
 
 > nltk
 
