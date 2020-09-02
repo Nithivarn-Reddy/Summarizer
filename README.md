@@ -1,4 +1,4 @@
-# cs5293sp20-project2
+# Summarizer
 
 The main aim of this project is to develop a summarizer which takes the data of COVID related literature from Kaggle and summarizes them. By doing so it helps the researchers and the student community to get a summary of all the similar documents which helps them in their respective research work.
 
